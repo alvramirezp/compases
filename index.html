@@ -5,25 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RitmoAventura: App Completa</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Incluir Tone.js para generar sonido rítmico -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.min.js"></script>
     <script>
-        // Configuración de Tailwind para usar un tema más juvenil y la fuente Inter
+        // Configuración de Tailwind
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        'primary-blue': '#4c70f5', // Se mantiene como color principal de la app
-                        'accent-yellow': '#ffc107', // AMARILLO (Usado para Número Inferior y acentos)
-                        'emerald-main': '#10b981', // NUEVO VERDE ESMERALDA (Usado para Número Superior)
+                        'primary-blue': '#4c70f5',
+                        'accent-yellow': '#ffc107',
+                        'emerald-main': '#10b981',
                         'strong-beat': '#f54c4c',
                         'weak-beat': '#a0a0a0',
                         'medium-beat': '#f97316',
                         'tap-green': '#10b981',
                         'tap-red': '#ef4444',
                         'dark-gray-bg': '#1f2937',
-                        'pending-gray': '#6b7280', // Nuevo color para el estado de carga
-                        'accent-pink': '#ec4899', // Color para el latido
+                        'pending-gray': '#6b7280',
+                        'accent-pink': '#ec4899',
                     },
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
@@ -35,7 +34,7 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
         
-        /* Estilos personalizados para botones de opción */
+        /* Botones de opción */
         .option-button {
             transition: all 0.2s ease-in-out;
             border: 3px solid transparent;
@@ -54,7 +53,7 @@
             background-color: #fee2e2;
         }
         
-        /* Animación que se dispara en cada pulso */
+        /* Animación de pulso */
         .beat-pulse {
             animation: pulse 0.15s ease-out; 
         }
@@ -64,58 +63,55 @@
             100% { transform: scale(1); }
         }
 
-        /* Estilo para mostrar el compás como fracción apilada */
+        /* Estilos de compases y fracciones */
         .meter-fraction {
             display: inline-block;
             line-height: 1;
         }
         .meter-fraction-top {
-            font-size: 1.5rem; /* 24px */
+            font-size: 1.5rem;
             font-weight: 900;
         }
         .meter-fraction-bottom {
-            font-size: 1.5rem; /* 24px */
+            font-size: 1.5rem;
             font-weight: 900;
         }
         
-        /* Estilo para el compás de ejemplo de la Receta (tamaño grande) */
+        /* Compás grande de la receta */
         .recipe-meter-number {
-            font-size: 4rem; /* 64px, mucho más grande */
+            font-size: 4rem;
             font-weight: 900;
             line-height: 1;
         }
 
         .recipe-divider {
             height: 4px; 
-            background-color: #9ca3af; /* gray-400 */
-            margin: 0.5rem 0; /* Margen superior/inferior para separarlo de los números */
+            background-color: #9ca3af;
+            margin: 0.5rem 0;
         }
         
-        /* Estilo específico para los compases en la sección de acentos */
+        /* Compases sección acentos */
         .accent-meter-fraction {
             display: inline-block;
             line-height: 1;
             margin-bottom: 0.5rem;
         }
         .accent-meter-number {
-            font-size: 2.5rem; /* Más grande que la sección de ejemplos, más legible */
+            font-size: 2.5rem;
             font-weight: 900;
         }
-
     </style>
 </head>
-<body class="bg-gray-100 font-sans min-h-screen p-4 flex items-center justify-center">
+<body class="bg-gray-100 font-sans p-4">
 
-    <div id="app-container" class="w-full max-w-4xl bg-white p-6 md:p-10 rounded-xl shadow-2xl border-b-8 border-primary-blue">
+    <div id="app-container" class="w-full max-w-4xl mx-auto bg-white p-6 md:p-10 rounded-xl shadow-2xl border-b-8 border-primary-blue">
         
-        <!-- Encabezado y Navegación -->
         <header class="text-center mb-8">
             <h1 class="text-4xl font-black text-primary-blue mb-2">
                 <span class="text-accent-yellow">🎶</span> RitmoAventura <span class="text-accent-yellow">🎶</span>
             </h1>
             <p class="text-gray-600 italic">¡Aprende y domina los Compases Musicales!</p>
             
-            <!-- Botones de Navegación -->
             <div class="mt-6 flex justify-center space-x-4">
                 <button id="navAprender" class="px-6 py-2 rounded-full font-bold text-lg transition duration-200 shadow-md bg-primary-blue text-white hover:bg-primary-blue/80">
                     📚 Aprender
@@ -126,105 +122,80 @@
             </div>
         </header>
 
-        <!-- Contenido Principal: APRENDER -->
         <section id="viewAprender">
             <h2 class="text-3xl font-bold text-gray-800 mb-6 border-b-2 pb-2 border-accent-yellow">Los compases musicales</h2>
 
             <div class="bg-blue-50 p-6 rounded-lg mb-6 shadow-inner border-l-4 border-primary-blue">
                 <h3 class="text-xl font-bold text-primary-blue mb-3">1. La "Receta Rítmica" (Los números del compás)</h3>
                 
-                <!-- Contenedor del Compás de ejemplo de la Receta -->
                 <div class="flex-shrink-0 bg-white p-6 rounded-lg shadow-xl w-full">
-                    
-                    <!-- Contenedor Flex para el Número del Compás y la Explicación -->
                     <div class="flex items-start space-x-6">
-
-                        <!-- Columna de la Fracción (Compás 4/4) -->
                         <div class="flex flex-col items-center justify-center">
-                            <!-- Número Superior (4) -->
                             <div class="text-center">
                                 <span id="recipeNumberTop" class="recipe-meter-number text-emerald-main">4</span>
                             </div>
-
-                            <!-- Barra divisoria (pequeña, solo debajo del número) -->
                             <div class="recipe-divider w-12 rounded-full"></div>
-
-                            <!-- Número Inferior (4) -->
                             <div class="text-center">
                                 <span id="recipeNumberBottom" class="recipe-meter-number text-accent-yellow">4</span>
                             </div>
                         </div>
 
-                        <!-- Columna de la Explicación -->
                         <div class="flex flex-col space-y-4 pt-2">
-                            
-                            <!-- Explicación Superior -->
                             <div class="text-gray-700 text-lg">
                                 <span class="font-bold text-emerald-main">Número Superior (El contador):</span> <br> 
                                 Indica <span class="font-extrabold">cuántas figuras</span> caben en el compás.
                             </div>
-                            
-                            <!-- Explicación Inferior -->
                             <div class="text-gray-700 text-lg">
                                 <span class="font-bold text-accent-yellow">Número Inferior (El ingrediente):</span> <br>
                                 Indica de <span class="font-extrabold">qué figura musical</span> se trata. 
                                 <div class="bg-yellow-100 p-3 mt-3 rounded-md border-l-4 border-accent-yellow shadow-sm text-sm">
+                                    <!-- CAMBIO REALIZADO: Se eliminó la duración entre paréntesis -->
                                     <ul class="list-disc list-inside space-y-1">
-                                        <li><span class="font-mono font-bold text-gray-800">1:</span> La Redonda (dura 4 pulsos)</li>
-                                        <li><span class="font-mono font-bold text-gray-800">2:</span> La Blanca (dura 2 pulsos)</li>
-                                        <li><span class="font-mono font-bold text-gray-800">4:</span> La Negra (dura 1 pulso)</li>
-                                        <li><span class="font-mono font-bold text-gray-800">8:</span> La Corchea (dura 1/2 pulso)</li>
+                                        <li><span class="font-mono font-bold text-gray-800">1:</span> Redonda</li>
+                                        <li><span class="font-mono font-bold text-gray-800">2:</span> Blanca</li>
+                                        <li><span class="font-mono font-bold text-gray-800">4:</span> Negra</li>
+                                        <li><span class="font-mono font-bold text-gray-800">8:</span> Corchea</li>
                                     </ul>
                                 </div>
                             </div>
                         </div>
-
                     </div>
                 </div>
 
-                <!-- Nuevos Ejemplos de Compases con formato de fracción -->
                 <h4 class="text-lg font-bold text-primary-blue mt-6 mb-3 border-t pt-4 border-gray-200">Ejemplos de compases</h4>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    
-                    <!-- Ejemplo 4/4 -->
                     <div class="p-4 bg-white rounded-lg shadow-md border-l-4 border-primary-blue text-center">
                         <div class="meter-fraction mb-4">
                             <div class="meter-fraction-top text-emerald-main">4</div>
                             <div class="h-0.5 bg-gray-400 w-10 mx-auto"></div>
                             <div class="meter-fraction-bottom text-accent-yellow">4</div>
                         </div>
-                        <!-- Texto principal (conservado) -->
                         <p class="text-xl font-extrabold text-gray-800">
                             <span class="text-emerald-main">Cuatro</span> <span class="text-accent-yellow">Negras</span>
                         </p>
                     </div>
                     
-                    <!-- Ejemplo 2/2 -->
                     <div class="p-4 bg-white rounded-lg shadow-md border-l-4 border-primary-blue text-center">
                         <div class="meter-fraction mb-4">
                             <div class="meter-fraction-top text-emerald-main">2</div>
                             <div class="h-0.5 bg-gray-400 w-10 mx-auto"></div>
                             <div class="meter-fraction-bottom text-accent-yellow">2</div>
                         </div>
-                        <!-- Texto principal (conservado) -->
                         <p class="text-xl font-extrabold text-gray-800">
                             <span class="text-emerald-main">Dos</span> <span class="text-accent-yellow">Blancas</span>
                         </p>
                     </div>
 
-                    <!-- Ejemplo 6/8 -->
                     <div class="p-4 bg-white rounded-lg shadow-md border-l-4 border-primary-blue text-center">
                         <div class="meter-fraction mb-4">
                             <div class="meter-fraction-top text-emerald-main">6</div>
                             <div class="h-0.5 bg-gray-400 w-10 mx-auto"></div>
                             <div class="meter-fraction-bottom text-accent-yellow">8</div>
                         </div>
-                        <!-- Texto principal (conservado) -->
                         <p class="text-xl font-extrabold text-gray-800">
                             <span class="text-emerald-main">Seis</span> <span class="text-accent-yellow">Corcheas</span>
                         </p>
                     </div>
-
                 </div>
             </div>
 
@@ -233,8 +204,6 @@
                 <p class="text-gray-700 mb-4">El ritmo tiene latidos <span class="font-extrabold">fuertes</span> (¡bum!) y <span class="font-extrabold">débiles</span> (tap). <br> Esto define si el compás es Binario, Ternario o Cuaternario.</p>
                 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
-                    
-                    <!-- Compás Binario (2/4) -->
                     <div class="p-4 bg-white rounded-lg shadow-md border-b-4 border-strong-beat">
                         <div class="accent-meter-fraction mx-auto">
                             <div class="accent-meter-number text-emerald-main">2</div>
@@ -245,7 +214,6 @@
                         <p class="text-gray-600">bum tap</p>
                     </div>
                     
-                    <!-- Compás Ternario (3/4) -->
                     <div class="p-4 bg-white rounded-lg shadow-md border-b-4 border-strong-beat">
                         <div class="accent-meter-fraction mx-auto">
                             <div class="accent-meter-number text-emerald-main">3</div>
@@ -256,7 +224,6 @@
                         <p class="text-gray-600">bum tap tap</p>
                     </div>
                     
-                    <!-- Compás Cuaternario (4/4) -->
                     <div class="p-4 bg-white rounded-lg shadow-md border-b-4 border-strong-beat">
                         <div class="accent-meter-fraction mx-auto">
                             <div class="accent-meter-number text-emerald-main">4</div>
@@ -273,31 +240,21 @@
                 <h3 class="text-xl font-bold text-accent-yellow mb-3">3. Las Figuras Musicales</h3>
                 <p class="text-gray-700">Las figuras musicales definen el <span class="font-extrabold">ritmo</span> de la obra musical. Nos indican <span class="font-extrabold">cuánto dura</span> cada sonido (o silencio).</p>
                 <p class="text-gray-700"> Para repasar las figuras musicales, sus silencios y su duración, utiliza la aplicación <span class="font-extrabold">Ritmo y Melodía</span>.</p>
-
             </div>
         </section>
 
-
-        <!-- Contenido Principal: JUGAR (DESAFÍO AUDITIVO) -->
         <section id="viewJugar" class="hidden">
             <h2 class="text-3xl font-bold text-gray-800 mb-6 border-b-2 pb-2 border-accent-yellow">🎧 Desafío Auditivo: Identifica el Compás</h2>
             
-            <!-- Panel de Control y Marcador -->
             <div class="flex justify-between items-center bg-dark-gray-bg text-white p-4 rounded-t-xl">
-                <!-- Puntuación (10 puntos por acierto) -->
                 <div class="text-lg font-bold">Puntuación: <span id="gameScore" class="text-green-400">0 / 100</span></div>
-                <!-- Ronda / Nivel de dificultad -->
                 <div class="text-lg font-bold">Ronda: <span id="gameLevel" class="text-accent-yellow">1 / 10</span></div>
-                <!-- Velocidad Actual (Dificultad Progresiva) -->
                 <div class="text-lg font-bold">Velocidad: <span id="currentBPMDisplay" class="text-accent-yellow">120</span> BPM</div> 
             </div>
 
-            <!-- Área de Metrónomo y Botón de Reproducción -->
             <div class="bg-gray-100 p-8 rounded-b-xl shadow-inner mb-6 text-center">
-                
                 <p class="text-gray-600 text-sm mb-4">Haz clic para escuchar el patrón de acentos. Elige la opción que coincida.</p>
 
-                <!-- Display Visual del Compás (Se oculta en rondas difíciles) -->
                 <div id="beatVisualizer" class="flex justify-center items-center h-20 mb-6">
                     <span id="visualBeat" class="text-6xl font-black text-gray-400">?</span>
                 </div>
@@ -307,7 +264,6 @@
                 </button>
             </div>
 
-            <!-- Opciones de Respuesta -->
             <div class="text-center">
                 <p class="text-xl font-bold text-gray-800 mb-4">¿Qué tipo de compás acabas de escuchar?</p>
                 <div id="answerOptions" class="grid grid-cols-3 gap-4">
@@ -323,7 +279,6 @@
                 </div>
             </div>
 
-            <!-- Mensajes y Overlay de Fin de Juego -->
             <div id="messageBox" class="mt-6 text-center text-xl font-bold h-8 text-gray-700"></div>
 
             <div id="gameOverModal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center hidden z-50">
@@ -335,13 +290,29 @@
                     </button>
                 </div>
             </div>
-
         </section>
 
     </div>
 
     <script type="text/javascript">
-        // Variables Globales de Vistas y Elementos DOM
+        // -----------------------------------------------------
+        // 1. CONSTANTES Y CONFIGURACIÓN DEL JUEGO
+        // -----------------------------------------------------
+        const MAX_ROUNDS = 10;
+        const POINTS_PER_ROUND = 10;
+        
+        // Mapeo de acentos: 1=Fuerte, 0.5=Medio, 0=Débil
+        const GAME_METERS = {
+            'Binario': { '2/4': [1, 0], '2/2': [1, 0] },
+            'Ternario': { '3/4': [1, 0, 0] },
+            'Cuaternario': { '4/4': [1, 0, 0.5, 0] }
+        };
+
+        // -----------------------------------------------------
+        // 2. VARIABLES DE ESTADO
+        // -----------------------------------------------------
+        
+        // Vistas y Navegación
         let currentView = 'aprender';
         const views = {
             aprender: document.getElementById('viewAprender'),
@@ -352,123 +323,147 @@
             jugar: document.getElementById('navJugar')
         };
         
-        // --- Lógica del Juego ---
+        // Elementos DOM del Juego
         const playButton = document.getElementById('playButton');
         const visualBeatElement = document.getElementById('visualBeat');
         const answerOptions = document.getElementById('answerOptions');
         const messageBox = document.getElementById('messageBox');
         const gameOverModal = document.getElementById('gameOverModal');
         
+        // Estado del Juego
         let score = 0;
-        let level = 1; // Contador de rondas (1 to 10)
-        const MAX_ROUNDS = 10;
-        const POINTS_PER_ROUND = 10;
-        let currentBPM = 120; // Velocidad actual
-        let showVisuals = true; // Controla si se muestra el número de pulso.
-
-        let currentChallenge = {}; // Contiene el compás (p.ej., '4/4') y el tipo ('Cuaternario')
+        let level = 1; 
+        let currentBPM = 120;
+        let showVisuals = true; 
+        let currentChallenge = {};
         let isPlaying = false;
-        let isAudioInitialized = false; // Bandera para controlar la inicialización de Tone.js
-        const lastChallenges = []; // Para almacenar los tipos de compás recientes y mejorar la aleatoriedad
+        const lastChallenges = []; 
         
-        // --- Configuración de Audio (Metrónomo) ---
+        // Estado de Audio
+        let isAudioInitialized = false;
         let loop = null;
-        let strongSynth = null; // Sintetizador para tiempos FUERTES (Acento)
-        let weakSynth = null;  // Sintetizador para tiempos DÉBILES y MEDIOS (Pulsos suaves)
+        let strongSynth = null;
+        let weakSynth = null;
 
-        // Definición de los compases: TIPO -> Fracción -> [Accent Level: 1=Fuerte, 0.5=Medio, 0=Débil]
-        const METERS_DATA = {
-            'Binario': {
-                '2/4': [1, 0], 
-                // Añadido 2/2 - es Binario, pero la unidad de tiempo es la Blanca (2)
-                '2/2': [1, 0] 
-            },
-            'Ternario': {
-                '3/4': [1, 0, 0] 
-            },
-            'Cuaternario': {
-                '4/4': [1, 0, 0.5, 0] 
-            },
-            // Añadido 6/8 como Compuesto. Se clasifica como Binario en el desafío auditivo (2 pulsos de 3 corcheas)
-            'Compuesto': {
-                // Este patrón de 6 corcheas se toca con 2 pulsos fuertes (en 1 y 4) en un tempo rápido (Binario)
-                '6/8': [1, 0, 0, 0.5, 0, 0] 
+        // -----------------------------------------------------
+        // 3. INICIALIZACIÓN Y NAVEGACIÓN
+        // -----------------------------------------------------
+
+        document.addEventListener('DOMContentLoaded', () => {
+            switchView('aprender'); 
+            
+            // Navegación
+            navButtons.jugar.addEventListener('click', () => {
+                switchView('jugar');
+                if (!isAudioInitialized) {
+                    setupAudio(); 
+                } else {
+                    startGame();
+                }
+            });
+            
+            navButtons.aprender.addEventListener('click', () => {
+                switchView('aprender');
+            });
+            
+            // Listeners del Juego (Se definen una sola vez)
+            document.getElementById('restartGame').addEventListener('click', restartGame);
+            
+            playButton.addEventListener('click', () => {
+                if (!isPlaying && !playButton.disabled && isAudioInitialized) {
+                    playChallenge();
+                } else if (isPlaying) {
+                    showMessage('El metrónomo está sonando. Espera a que termine.', false);
+                }
+            });
+
+            answerOptions.addEventListener('click', (e) => {
+                const button = e.target.closest('.option-button');
+                if (button && !button.disabled) {
+                    checkAnswer(button.getAttribute('data-answer'));
+                }
+            });
+            
+            // Estado inicial botón
+            playButton.disabled = true;
+            playButton.textContent = 'Esperando interacción para cargar audio...';
+        });
+
+        function switchView(viewName) {
+            currentView = viewName;
+            
+            // Cambiar visibilidad de secciones
+            Object.values(views).forEach(v => v.classList.add('hidden'));
+            views[viewName].classList.remove('hidden');
+            
+            // Actualizar estilos de botones de navegación
+            Object.entries(navButtons).forEach(([key, button]) => {
+                if (key === viewName) {
+                    button.className = "px-6 py-2 rounded-full font-bold text-lg transition duration-200 shadow-md bg-primary-blue text-white hover:bg-primary-blue/80";
+                } else {
+                    button.className = "px-6 py-2 rounded-full font-bold text-lg transition duration-200 shadow-md bg-gray-200 text-gray-800 hover:bg-accent-yellow hover:text-white";
+                }
+            });
+
+            // Limpieza al salir de la vista de juego
+            if (Tone.Transport && Tone.Transport.state === 'started') {
+                 Tone.Transport.stop();
+                 isPlaying = false;
+                 if (loop) { loop.dispose(); loop = null; }
             }
-        };
+        }
 
-        // Modificamos el MAPEO para el desafío auditivo para simplificar a los 3 tipos de acento.
-        const GAME_METERS = {
-            'Binario': { '2/4': [1, 0], '2/2': [1, 0] },
-            'Ternario': { '3/4': [1, 0, 0] },
-            'Cuaternario': { '4/4': [1, 0, 0.5, 0] }
-        };
+        // -----------------------------------------------------
+        // 4. LÓGICA DE AUDIO (TONE.JS)
+        // -----------------------------------------------------
         
-        // Función para inicializar el audio, llamada al primer clic del usuario en Jugar
         async function setupAudio() {
             if (isAudioInitialized) return;
 
-            // Deshabilitar el botón y mostrar mensaje de carga
             playButton.disabled = true;
-            playButton.textContent = 'Cargando Sonidos de Metrónomo...'; 
+            playButton.textContent = 'Cargando Sonidos...'; 
             
-            // Iniciar el contexto de audio
             try {
                 await Tone.start();
             } catch (error) {
-                console.error("Error al iniciar el contexto de audio:", error);
-                playButton.textContent = 'Error: Fallo al iniciar audio.';
+                console.error("Error audio:", error);
+                playButton.textContent = 'Error Audio';
                 return;
             }
             
-            // 1. Synth para tiempos FUERTES (Más alto y pitch más agudo)
             strongSynth = new Tone.MembraneSynth({
-                pitchDecay: 0.05,
-                octaves: 2, 
-                volume: -6, // Fuerte
-                envelope: {
-                    attack: 0.001, decay: 0.1, sustain: 0.0, release: 0.05, attackCurve: 'exponential'
-                }
+                pitchDecay: 0.05, octaves: 2, volume: -6,
+                envelope: { attack: 0.001, decay: 0.1, sustain: 0.0, release: 0.05, attackCurve: 'exponential' }
             }).toDestination();
             
-            // 2. Synth para tiempos DÉBILES y MEDIOS (Más suave y pitch más grave)
             weakSynth = new Tone.MembraneSynth({
-                pitchDecay: 0.03,
-                octaves: 1, 
-                volume: -10, // Suave
-                envelope: {
-                    attack: 0.001, decay: 0.07, sustain: 0.0, release: 0.03, attackCurve: 'exponential'
-                }
+                pitchDecay: 0.03, octaves: 1, volume: -10,
+                envelope: { attack: 0.001, decay: 0.07, sustain: 0.0, release: 0.03, attackCurve: 'exponential' }
             }).toDestination();
             
             isAudioInitialized = true;
             playButton.disabled = false;
             updateUI();
-            startGame(); // Inicia el juego automáticamente después de la carga
+            startGame(); 
         }
 
-        /**
-         * Reproduce el patrón rítmico. 
-         * Ahora toma el compás del estado global `currentChallenge`
-         */
         function playChallenge() {
             if (isPlaying || !isAudioInitialized || !currentChallenge.pattern) return;
             
             isPlaying = true;
             playButton.disabled = true;
             
-            const { pattern, type } = currentChallenge;
-            
-            // LÓGICA DE REPETICIÓN MEJORADA: 
+            const { pattern } = currentChallenge;
             const measuresToPlay = 2; 
             const stopTime = `${measuresToPlay}m`; 
 
-            // Detener y limpiar cualquier loop previo y el Transport
+            // Limpieza previa
             if (loop) loop.dispose();
             Tone.Transport.stop(); 
             Tone.Transport.cancel(); 
             loop = null; 
             
-            // Reset visual inicial (solo el fondo, el número se pone con el primer beat)
+            // Reset visual temporal
             if (showVisuals) {
                 visualBeatElement.style.opacity = '1'; 
                 visualBeatElement.textContent = '?';
@@ -483,9 +478,8 @@
             const beatsPerMeasure = pattern.length;
             let currentBeatIndex = 0; 
             
-            // 1. Programar el loop para tocar
+            // Definir el bucle
             loop = new Tone.Loop(function (time) {
-                
                 const beatIndexInMeasure = currentBeatIndex % beatsPerMeasure; 
                 const accent = pattern[beatIndexInMeasure];
                 
@@ -493,66 +487,44 @@
                 let note = "C4"; 
                 let velocity = 0.8; 
 
-                // Determinar el sonido y acento
-                if (accent === 1) { // Fuerte
-                    currentSynth = strongSynth;
-                    note = "G4"; 
-                    velocity = 1.0; 
-                } else if (accent === 0.5) { // Medio Fuerte (solo en 4/4)
-                    currentSynth = weakSynth;
-                    note = "C4"; 
-                    velocity = 0.9;
-                } else { // Débil (0)
-                    currentSynth = weakSynth;
-                    note = "C4"; 
-                    velocity = 0.8; 
+                if (accent === 1) { 
+                    currentSynth = strongSynth; note = "G4"; velocity = 1.0; 
+                } else if (accent === 0.5) { 
+                    currentSynth = weakSynth; note = "C4"; velocity = 0.9;
                 }
 
                 currentSynth.triggerAttackRelease(note, "16n", time, velocity);
 
-                // --- Lógica de Actualización Visual sincronizada con el audio ---
+                // Sincronización Visual
                 if (showVisuals) {
                     Tone.Draw.schedule(function () {
                         const visualIndex = beatIndexInMeasure + 1; 
-                        
                         let colorClass = 'text-weak-beat';
                         if (accent === 1) colorClass = 'text-strong-beat';
                         else if (accent === 0.5) colorClass = 'text-medium-beat';
                         
-                        // 1. Limpiar la clase de animación para que se reinicie
                         visualBeatElement.classList.remove('beat-pulse');
-                        
-                        // 2. Actualizar el número y las clases de color
                         visualBeatElement.textContent = visualIndex;
                         visualBeatElement.classList.remove('text-strong-beat', 'text-medium-beat', 'text-weak-beat', 'text-pending-gray');
                         visualBeatElement.classList.add(colorClass);
 
-                        // 3. Forzar un reflow/repaint ANTES de añadir la clase de animación (CRÍTICO)
+                        // Trigger reflow para reiniciar animación CSS
                         void visualBeatElement.offsetWidth; 
-
-                        // 4. Aplicar la clase de animación para disparar el pulso visible
                         visualBeatElement.classList.add('beat-pulse');
                         visualBeatElement.style.opacity = '1';
-                        
                     }, time);
                 }
-
                 currentBeatIndex++; 
-                
             }, '4n').start(0); 
             
-            // 2. Programar el stop del transport y el reset de la UI al final del tiempo musical
+            // Programar parada
             Tone.Transport.scheduleOnce(() => {
                 Tone.Transport.stop();
                 isPlaying = false; 
                 playButton.disabled = false;
                 
-                if (loop) { 
-                    loop.dispose(); 
-                    loop = null;
-                }
+                if (loop) { loop.dispose(); loop = null; }
                 
-                // Reset visual final (Vuelta al estado de espera)
                 if (showVisuals) {
                     visualBeatElement.textContent = '?';
                     visualBeatElement.classList.remove('text-strong-beat', 'text-medium-beat', 'text-weak-beat', 'beat-pulse');
@@ -562,68 +534,56 @@
                     visualBeatElement.textContent = '🎶'; 
                     visualBeatElement.style.opacity = '0';
                 }
-
             }, stopTime); 
             
-            Tone.Transport.start(); // Inicia el Transport
+            Tone.Transport.start();
         }
 
-        // --- Funciones de Juego ---
+        // -----------------------------------------------------
+        // 5. LÓGICA DEL JUEGO
+        // -----------------------------------------------------
 
-        function updateUI() {
-            document.getElementById('gameScore').textContent = `${score} / 100`;
-            document.getElementById('gameLevel').textContent = `${level} / ${MAX_ROUNDS}`;
-            
-            if (currentView === 'jugar' && isAudioInitialized) {
-                document.getElementById('currentBPMDisplay').textContent = currentBPM;
-                playButton.textContent = `🔊 Escuchar Compás (BPM ${currentBPM})`;
+        function startGame() {
+            score = 0;
+            level = 1;
+            lastChallenges.length = 0; 
+            updateUI();
+            gameOverModal.classList.add('hidden');
+            selectNewChallenge();
+        }
+
+        function restartGame() {
+            if (Tone.Transport && Tone.Transport.state === 'started') {
+                 Tone.Transport.stop();
+                 isPlaying = false;
+                 if (loop) { loop.dispose(); loop = null; }
             }
+            startGame();
         }
 
-        function showMessage(text, isError = false) {
-            messageBox.textContent = text;
-            messageBox.className = `mt-6 text-center text-xl font-bold h-8 transition-colors duration-200 ${isError ? 'text-tap-red beat-pulse' : 'text-tap-green beat-pulse'}`;
-            setTimeout(() => {
-                messageBox.textContent = '';
-                messageBox.classList.remove('beat-pulse');
-            }, 3000);
-        }
-
-        /**
-         * Selecciona un nuevo desafío, actualiza la dificultad y el estado de la UI.
-         */
         function selectNewChallenge() {
-            // Deshabilitar botón mientras se carga el desafío (para evitar el error reportado)
             playButton.disabled = true;
-            playButton.textContent = 'Cargando nuevo desafío...'; 
+            playButton.textContent = 'Cargando...'; 
 
-            // 1. Dificultad Progresiva: Actualizar BPM y Visuales
+            // Configurar Dificultad
             if (level <= 4) {
-                currentBPM = 100; // Lento, Visuales ON
-                showVisuals = true;
+                currentBPM = 100; showVisuals = true;
             } else if (level <= 7) {
-                currentBPM = 120; // Medio, Visuales OFF (Dificultad media)
-                showVisuals = false;
-            } else { // Rondas 8-10
-                currentBPM = 140; // Rápido, Visuales OFF (Dificultad alta)
-                showVisuals = false;
+                currentBPM = 120; showVisuals = false;
+            } else {
+                currentBPM = 140; showVisuals = false;
             }
             
-            // 2. Selección Aleatoria de Compás
-            // Usamos solo los tipos de acento Binario, Ternario, Cuaternario para el desafío
+            // Selección Aleatoria Evitando Repetición Inmediata
             const allTypes = Object.keys(GAME_METERS);
             const availableTypes = allTypes.filter(type => !lastChallenges.includes(type));
-            let randomType;
-            if (availableTypes.length > 0) {
-                randomType = availableTypes[Math.floor(Math.random() * availableTypes.length)];
-            } else {
-                randomType = allTypes[Math.floor(Math.random() * allTypes.length)];
-            }
+            
+            let randomType = availableTypes.length > 0 
+                ? availableTypes[Math.floor(Math.random() * availableTypes.length)] 
+                : allTypes[Math.floor(Math.random() * allTypes.length)];
             
             lastChallenges.push(randomType);
-            if (lastChallenges.length > 2) {
-                lastChallenges.shift();
-            }
+            if (lastChallenges.length > 2) lastChallenges.shift();
             
             const fractions = Object.keys(GAME_METERS[randomType]);
             const randomFraction = fractions[Math.floor(Math.random() * fractions.length)];
@@ -634,17 +594,16 @@
                 pattern: GAME_METERS[randomType][randomFraction]
             };
             
-            // 3. Limpiar y Habilitar UI
+            // Reset UI de Opciones
             Array.from(answerOptions.children).forEach(btn => {
                 btn.classList.remove('correct', 'wrong');
                 btn.disabled = false;
             });
             
-            // Aplicar estado visual inicial del metrónomo
+            // Reset Visual Metrónomo
             if (showVisuals) {
                 visualBeatElement.style.opacity = '1';
                 visualBeatElement.textContent = '?';
-                // Usar 'pending-gray' para la interrogación de espera
                 visualBeatElement.classList.remove('text-strong-beat', 'text-medium-beat', 'text-weak-beat');
                 visualBeatElement.classList.add('text-pending-gray'); 
             } else {
@@ -654,40 +613,28 @@
 
             updateUI();
             
-            // Habilitar el botón de reproducir solo cuando el desafío está cargado
             if (isAudioInitialized) {
                 playButton.disabled = false;
                 playButton.textContent = `🔊 Escuchar Compás (BPM ${currentBPM})`;
             }
         }
 
-        /**
-         * Verifica la respuesta del usuario.
-         */
         function checkAnswer(selectedType) {
-            // Previene responder antes de que termine el audio
             if (isPlaying) {
-                showMessage('Espera a que termine de sonar el compás para responder.', true);
+                showMessage('Espera a que termine de sonar el compás.', true);
                 return;
             }
 
-            // Deshabilitamos el botón de reproducir para evitar el bug de audio desincronizado
             playButton.disabled = true;
-            
             const correctType = currentChallenge.type;
             const allButtons = Array.from(answerOptions.children);
             
-            // Deshabilitar botones de respuesta
             allButtons.forEach(btn => btn.disabled = true);
             
-            // Marcar respuesta visualmente
             allButtons.forEach(btn => {
                 const answer = btn.getAttribute('data-answer');
-                if (answer === correctType) {
-                    btn.classList.add('correct');
-                } else if (answer === selectedType) {
-                    btn.classList.add('wrong');
-                }
+                if (answer === correctType) btn.classList.add('correct');
+                else if (answer === selectedType) btn.classList.add('wrong');
             });
 
             if (selectedType === correctType) {
@@ -704,40 +651,7 @@
                 document.getElementById('finalScore').textContent = `${score} / 100`;
                 setTimeout(endGame, 3500); 
             } else {
-                // Siguiente ronda: el timeout mantiene el feedback en pantalla
-                setTimeout(() => {
-                    selectNewChallenge(); // Aquí se re-habilita el playButton
-                }, 3500);
-            }
-        }
-
-        // --- Control de Estado del Juego ---
-
-        function startGame() {
-            score = 0;
-            level = 1;
-            lastChallenges.length = 0; 
-            
-            updateUI();
-            gameOverModal.classList.add('hidden');
-            selectNewChallenge(); // Primera llamada para cargar el desafío
-
-            // Asignar listeners (asegurar que solo se asignen una vez)
-            if (!answerOptions.getAttribute('data-listeners-set')) {
-                answerOptions.onclick = (e) => {
-                    const button = e.target.closest('.option-button');
-                    if (button && !button.disabled) {
-                        checkAnswer(button.getAttribute('data-answer'));
-                    }
-                };
-                playButton.onclick = () => {
-                    if (!isPlaying && !playButton.disabled && isAudioInitialized) {
-                        playChallenge();
-                    } else if (isPlaying) {
-                        showMessage('El metrónomo está sonando. Espera a que termine.', false);
-                    }
-                };
-                answerOptions.setAttribute('data-listeners-set', 'true');
+                setTimeout(() => { selectNewChallenge(); }, 3500);
             }
         }
 
@@ -745,72 +659,28 @@
             gameOverModal.classList.remove('hidden');
         }
 
-        // --- Inicialización y Navegación ---
-        function switchView(viewName) {
-            currentView = viewName;
+        // -----------------------------------------------------
+        // 6. UTILIDADES UI
+        // -----------------------------------------------------
+
+        function updateUI() {
+            document.getElementById('gameScore').textContent = `${score} / 100`;
+            document.getElementById('gameLevel').textContent = `${level} / ${MAX_ROUNDS}`;
             
-            Object.values(views).forEach(v => v.classList.add('hidden'));
-            views[viewName].classList.remove('hidden');
-            
-            Object.entries(navButtons).forEach(([key, button]) => {
-                if (key === viewName) {
-                    button.classList.remove('bg-gray-200', 'text-gray-800', 'hover:bg-accent-yellow', 'hover:text-white');
-                    button.classList.add('bg-primary-blue', 'text-white', 'hover:bg-primary-blue/80');
-                } else {
-                    button.classList.remove('bg-primary-blue', 'text-white', 'hover:bg-primary-blue/80');
-                    button.classList.add('bg-gray-200', 'text-gray-800', 'hover:bg-accent-yellow', 'hover:text-white');
-                }
-            });
-            // Detener el transporte de audio al salir de la vista de juego
-            if (Tone.Transport && Tone.Transport.state === 'started') {
-                 Tone.Transport.stop();
-                 isPlaying = false;
-                 // Intentar limpiar el loop si existe
-                 if (loop) { 
-                    loop.dispose(); 
-                    loop = null;
-                 }
+            if (currentView === 'jugar' && isAudioInitialized) {
+                document.getElementById('currentBPMDisplay').textContent = currentBPM;
+                playButton.textContent = `🔊 Escuchar Compás (BPM ${currentBPM})`;
             }
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            switchView('aprender'); 
-            
-            // Listener para la navegación a Jugar (INICIALIZA AUDIO y llama a startGame)
-            navButtons.jugar.addEventListener('click', () => {
-                switchView('jugar');
-                if (!isAudioInitialized) {
-                    setupAudio(); 
-                } else {
-                    startGame();
-                }
-            });
-            
-            // Asignar listeners de navegación
-            navButtons.aprender.addEventListener('click', () => {
-                switchView('aprender');
-            });
-            
-            // Listener para reiniciar el juego
-            document.getElementById('restartGame').addEventListener('click', restartGame);
-            
-            // Estado inicial del botón de reproducción antes de la interacción de usuario
-            playButton.disabled = true;
-            playButton.textContent = 'Esperando interacción para cargar audio...';
-        });
-
-        // Aseguramos que la función restartGame esté disponible
-        function restartGame() {
-            // Aseguramos que el metrónomo esté detenido
-            if (Tone.Transport && Tone.Transport.state === 'started') {
-                 Tone.Transport.stop();
-                 isPlaying = false;
-                 if (loop) { 
-                    loop.dispose(); 
-                    loop = null;
-                 }
-            }
-            startGame();
+        function showMessage(text, isError = false) {
+            messageBox.textContent = text;
+            const colorClass = isError ? 'text-tap-red' : 'text-tap-green';
+            messageBox.className = `mt-6 text-center text-xl font-bold h-8 transition-colors duration-200 ${colorClass} beat-pulse`;
+            setTimeout(() => {
+                messageBox.textContent = '';
+                messageBox.classList.remove('beat-pulse');
+            }, 3000);
         }
     </script>
 </body>
