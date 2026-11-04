@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ritmo y Compás</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.min.js"></script>
+    <script>
+        // Configuración de Tailwind
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-blue': '#4c70f5',
+                        'accent-yellow': '#ffc107',
+                        'emerald-main': '#10b981',
+                        'strong-beat': '#f54c4c',
+                        'weak-beat': '#a0a0a0',
+                        'medium-beat': '#f97316',
+                        'tap-green': '#10b981',
+                        'tap-red': '#ef4444',
+                        'dark-gray-bg': '#1f2937',
+                        'pending-gray': '#6b7280',
+                        'accent-pink': '#ec4899',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+        
+        /* Botones de opción */
+        .option-button {
+            transition: all 0.2s ease-in-out;
+            border: 3px solid transparent;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .option-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+        }
+        .option-button.correct {
+            border-color: var(--tw-colors-tap-green);
+            background-color: #d1fae5;
+        }
+        .option-button.wrong {
+            border-color: var(--tw-colors-tap-red);
+            background-color: #fee2e2;
+        }
+        
+        /* Animación de pulso */
+        .beat-pulse {
+            animation: pulse 0.15s ease-out; 
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); } 
+            100% { transform: scale(1); }
+        }
+
+        /* Estilos de compases y fracciones */
+        .meter-fraction {
+            display: inline-block;
+            line-height: 1;
+        }
+        .meter-fraction-top {
+            font-size: 1.5rem;
+            font-weight: 900;
+        }
+        .meter-fraction-bottom {
+            font-size: 1.5rem;
+            font-weight: 900;
+        }
+        
+        /* Compás grande de la receta */
+        .recipe-meter-number {
+            font-size: 4rem;
+            font-weight: 900;
+            line-height: 1;
+        }
+
+        .recipe-divider {
+            height: 4px; 
+            background-color: #9ca3af;
+            margin: 0.5rem 0;
+        }
+        
+        /* Compases sección acentos */
+        .accent-meter-fraction {
+            display: inline-block;
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+        .accent-meter-number {
+            font-size: 2.5rem;
+            font-weight: 900;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans p-4">
+
+    <div id="app-container" class="w-full max-w-4xl mx-auto bg-white p-6 md:p-10 rounded-xl shadow-2xl border-b-8 border-primary-blue">
+        
+        <header class="text-center mb-8">
+            <h1 class="text-4xl font-black text-primary-blue mb-2">
+                <span class="text-accent-yellow">🎶</span> Ritmo y Compás <span class="text-accent-yellow">🎶</span>
+            </h1>
+            <p class="text-gray-600 italic">¡Aprende y domina los Compases Musicales!</p>
+            
+            <div class="mt-6 flex justify-center space-x-4">
+                <button id="navAprender" class="px-6 py-2 rounded-full font-bold text-lg transition duration-200 shadow-md bg-primary-blue text-white hover:bg-primary-blue/80">
+                    📚 Aprender
+                </button>
+                <button id="navJugar" class="px-6 py-2 rounded-full font-bold text-lg transition duration-200 shadow-md bg-gray-200 text-gray-800 hover:bg-accent-yellow hover:text-white">
+                    🎧 Jugar
+                </button>
+            </div>
+        </header>
+
+        <section id="viewAprender">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 border-b-2 pb-2 border-accent-yellow">Los compases musicales</h2>
+
+            <div class="bg-blue-50 p-6 rounded-lg mb-6 shadow-inner border-l-4 border-primary-blue">
+                <h3 class="text-xl font-bold text-primary-blue mb-3">1. La "Receta Rítmica" (Los números del compás)</h3>
+                
+                <div class="flex-shrink-0 bg-white p-6 rounded-lg shadow-xl w-full">
+                    <div class="flex items-start space-x-6">
+                        <div class="flex flex-col items-center justify-center">
+                            <div class="text-center">
+                                <span id="recipeNumberTop" class="recipe-meter-number text-emerald-main">4</span>
+                            </div>
+                            <div class="recipe-divider w-12 rounded-full"></div>
+                            <div class="text-center">
+                                <span id="recipeNumberBottom" class="recipe-meter-number text-accent-yellow">4</span>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col space-y-4 pt-2">
+                            <div class="text-gray-700 text-lg">
+                                <span class="font-bold text-emerald-main">Número Superior (El contador):</span> <br> 
+                                Indica <span class="font-extrabold">cuántas figuras</span> caben en el compás.
+                            </div>
+                            <div class="text-gray-700 text-lg">
+                                <span class="font-bold text-accent-yellow">Número Inferior (El ingrediente):</span> <br>
+                                Indica de <span class="font-extrabold">qué figura musical</span> se trata. 
+                                <div class="bg-yellow-100 p-3 mt-3 rounded-md border-l-4 border-accent-yellow shadow-sm text-sm">
+                                    <ul class="list-disc list-inside space-y-1">
+                                        <li><span class="font-mono font-bold text-gray-800">1:</span> Redonda</li>
+                                        <li><span class="font-mono font-bold text-gray-800">2:</span> Blanca</li>
+                                        <li><span class="font-mono font-bold text-gray-800">4:</span> Negra</li>
+                                        <li><span class="font-mono font-bold text-gray-800">8:</span> Corchea</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <h4 class="text-lg font-bold text-primary-blue mt-6 mb-3 border-t pt-4 border-gray-200">Ejemplos de compases</h4>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="p-4 bg-white rounded-lg shadow-md border-l-4 border-primary-blue text-center">
+                        <div class="meter-fraction mb-4">
+                            <div class="meter-fraction-top text-emerald-main">4</div>
+                            <div class="h-0.5 bg-gray-400 w-10 mx-auto"></div>
+                            <div class="meter-fraction-bottom text-accent-yellow">4</div>
+                        </div>
+                        <p class="text-xl font-extrabold text-gray-800">
+                            <span class="text-emerald-main">Cuatro</span> <span class="text-accent-yellow">Negras</span>
+                        </p>
+                    </div>
+                    
+                    <div class="p-4 bg-white rounded-lg shadow-md border-l-4 border-primary-blue text-center">
+                        <div class="meter-fraction mb-4">
+                            <div class="meter-fraction-top text-emerald-main">2</div>
+                            <div class="h-0.5 bg-gray-400 w-10 mx-auto"></div>
+                            <div class="meter-fraction-bottom text-accent-yellow">2</div>
+                        </div>
+                        <p class="text-xl font-extrabold text-gray-800">
+                            <span class="text-emerald-main">Dos</span> <span class="text-accent-yellow">Blancas</span>
+                        </p>
+                    </div>
+
+                    <div class="p-4 bg-white rounded-lg shadow-md border-l-4 border-primary-blue text-center">
+                        <div class="meter-fraction mb-4">
+                            <div class="meter-fraction-top text-emerald-main">6</div>
+                            <div class="h-0.5 bg-gray-400 w-10 mx-auto"></div>
+                            <div class="meter-fraction-bottom text-accent-yellow">8</div>
+                        </div>
+                        <p class="text-xl font-extrabold text-gray-800">
+                            <span class="text-emerald-main">Seis</span> <span class="text-accent-yellow">Corcheas</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-pink-50 p-6 rounded-lg mb-6 shadow-inner border-l-4 border-accent-pink">
+                <h3 class="text-xl font-bold text-accent-pink mb-3">2. El "latido del corazón musical" (Acentos)</h3>
+                <p class="text-gray-700 mb-4">El ritmo tiene latidos <span class="font-extrabold">fuertes</span> (¡bum!) y <span class="font-extrabold">débiles</span> (tap). <br> Esto define si el compás es Binario, Ternario o Cuaternario.</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+                    <div class="p-4 bg-white rounded-lg shadow-md border-b-4 border-strong-beat">
+                        <div class="accent-meter-fraction mx-auto">
+                            <div class="accent-meter-number text-emerald-main">2</div>
+                            <div class="h-1 bg-gray-400 w-12 mx-auto rounded-full"></div>
+                            <div class="accent-meter-number text-accent-yellow">4</div>
+                        </div>
+                        <p class="text-xl font-black text-strong-beat mt-2">Binario</p>
+                        <p class="text-gray-600">bum tap</p>
+                    </div>
+                    
+                    <div class="p-4 bg-white rounded-lg shadow-md border-b-4 border-strong-beat">
+                        <div class="accent-meter-fraction mx-auto">
+                            <div class="accent-meter-number text-emerald-main">3</div>
+                            <div class="h-1 bg-gray-400 w-12 mx-auto rounded-full"></div>
+                            <div class="accent-meter-number text-accent-yellow">4</div>
+                        </div>
+                        <p class="text-xl font-black text-strong-beat mt-2">Ternario</p>
+                        <p class="text-gray-600">bum tap tap</p>
+                    </div>
+                    
+                    <div class="p-4 bg-white rounded-lg shadow-md border-b-4 border-strong-beat">
+                        <div class="accent-meter-fraction mx-auto">
+                            <div class="accent-meter-number text-emerald-main">4</div>
+                            <div class="h-1 bg-gray-400 w-12 mx-auto rounded-full"></div>
+                            <div class="accent-meter-number text-accent-yellow">4</div>
+                        </div>
+                        <p class="text-xl font-black text-strong-beat mt-2">Cuaternario</p>
+                        <p class="text-gray-600">bum tap tap tap</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-yellow-50 p-6 rounded-lg shadow-inner border-l-4 border-accent-yellow">
+                <h3 class="text-xl font-bold text-accent-yellow mb-3">3. Las Figuras Musicales</h3>
+                <p class="text-gray-700">Las figuras musicales definen el <span class="font-extrabold">ritmo</span> de la obra musical. Nos indican <span class="font-extrabold">cuánto dura</span> cada sonido (o silencio).</p>
+                <p class="text-gray-700"> Para repasar las figuras musicales, sus silencios y su duración, utiliza la aplicación <span class="font-extrabold">Ritmo y Melodía</span>.</p>
+            </div>
+
+            <!-- Footer añadido según especificaciones de la plataforma principal -->
+            <footer class="text-center mt-8 pt-6 border-t border-gray-100 flex flex-col items-center justify-center space-y-3">
+                <p class="text-xs font-semibold text-gray-400 uppercase tracking-widest text-center">
+                    Mundo Pentagrama | Portal Educativo | Álvaro Ramírez
+                </p>
+                <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" class="hover:opacity-80 transition-opacity" title="Licencia Creative Commons Atribución-NoComercial-CompartirIgual 4.0 Internacional">
+                    <img alt="Licencia Creative Commons" src="https://mirrors.creativecommons.org/presskit/buttons/88x31/svg/by-nc-sa.svg" class="h-8" />
+                </a>
+            </footer>
+        </section>
+
+        <section id="viewJugar" class="hidden">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 border-b-2 pb-2 border-accent-yellow">🎧 Desafío Auditivo: Identifica el Compás</h2>
+            
+            <div class="flex justify-between items-center bg-dark-gray-bg text-white p-4 rounded-t-xl">
+                <div class="text-lg font-bold">Puntuación: <span id="gameScore" class="text-green-400">0 / 100</span></div>
+                <div class="text-lg font-bold">Ronda: <span id="gameLevel" class="text-accent-yellow">1 / 10</span></div>
+                <div class="text-lg font-bold">Velocidad: <span id="currentBPMDisplay" class="text-accent-yellow">120</span> BPM</div> 
+            </div>
+
+            <div class="bg-gray-100 p-8 rounded-b-xl shadow-inner mb-6 text-center">
+                <p class="text-gray-600 text-sm mb-4">Haz clic para escuchar el patrón de acentos. Elige la opción que coincida.</p>
+
+                <div id="beatVisualizer" class="flex justify-center items-center h-20 mb-6">
+                    <span id="visualBeat" class="text-6xl font-black text-gray-400">?</span>
+                </div>
+                
+                <button id="playButton" class="px-10 py-4 bg-primary-blue text-white text-xl font-bold rounded-lg shadow-lg hover:bg-primary-blue/90 transition duration-150" disabled>
+                    🔊 Escuchar Compás (BPM 120)
+                </button>
+            </div>
+
+            <div class="text-center">
+                <p class="text-xl font-bold text-gray-800 mb-4">¿Qué tipo de compás acabas de escuchar?</p>
+                <div id="answerOptions" class="grid grid-cols-3 gap-4">
+                    <button class="option-button p-4 rounded-lg bg-white font-bold text-lg text-gray-800" data-answer="Binario">
+                        Binario (2/4)
+                    </button>
+                    <button class="option-button p-4 rounded-lg bg-white font-bold text-lg text-gray-800" data-answer="Ternario">
+                        Ternario (3/4)
+                    </button>
+                    <button class="option-button p-4 rounded-lg bg-white font-bold text-lg text-gray-800" data-answer="Cuaternario">
+                        Cuaternario (4/4)
+                    </button>
+                </div>
+            </div>
+
+            <div id="messageBox" class="mt-6 text-center text-xl font-bold h-8 text-gray-700"></div>
+
+            <div id="gameOverModal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center hidden z-50">
+                <div class="bg-white p-8 rounded-xl text-center shadow-2xl transform transition-all duration-300 scale-95">
+                    <h3 class="text-4xl font-black text-primary-blue mb-4">¡FIN DEL DESAFÍO! 🥳</h3>
+                    <p class="text-xl text-gray-700 mb-6">Conseguiste identificar <span id="finalScore" class="text-accent-yellow font-extrabold text-3xl">0 / 100</span> puntos</p>
+                    <button id="restartGame" class="px-8 py-3 bg-green-500 text-white font-bold rounded-lg shadow-lg hover:bg-green-600 transition duration-150">
+                        Volver a Empezar
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <script type="text/javascript">
+        // -----------------------------------------------------
+        // 1. CONSTANTES Y CONFIGURACIÓN DEL JUEGO
+        // -----------------------------------------------------
+        const MAX_ROUNDS = 10;
+        const POINTS_PER_ROUND = 10;
+        
+        // Mapeo de acentos: 1=Fuerte, 0.5=Medio, 0=Débil
+        const GAME_METERS = {
+            'Binario': { '2/4': [1, 0], '2/2': [1, 0] },
+            'Ternario': { '3/4': [1, 0, 0] },
+            'Cuaternario': { '4/4': [1, 0, 0.5, 0] }
+        };
+
+        // -----------------------------------------------------
+        // 2. VARIABLES DE ESTADO
+        // -----------------------------------------------------
+        
+        // Vistas y Navegación
+        let currentView = 'aprender';
+        const views = {
+            aprender: document.getElementById('viewAprender'),
+            jugar: document.getElementById('viewJugar')
+        };
+        const navButtons = {
+            aprender: document.getElementById('navAprender'),
+            jugar: document.getElementById('navJugar')
+        };
+        
+        // Elementos DOM del Juego
+        const playButton = document.getElementById('playButton');
+        const visualBeatElement = document.getElementById('visualBeat');
+        const answerOptions = document.getElementById('answerOptions');
+        const messageBox = document.getElementById('messageBox');
+        const gameOverModal = document.getElementById('gameOverModal');
+        
+        // Estado del Juego
+        let score = 0;
+        let level = 1; 
+        let currentBPM = 120;
+        let showVisuals = true; 
+        let currentChallenge = {};
+        let isPlaying = false;
+        const lastChallenges = []; 
+        
+        // Estado de Audio
+        let isAudioInitialized = false;
+        let loop = null;
+        let strongSynth = null;
+        let weakSynth = null;
+
+        // -----------------------------------------------------
+        // 3. INICIALIZACIÓN Y NAVEGACIÓN
+        // -----------------------------------------------------
+
+        document.addEventListener('DOMContentLoaded', () => {
+            switchView('aprender'); 
+            
+            // Navegación
+            navButtons.jugar.addEventListener('click', () => {
+                switchView('jugar');
+                if (!isAudioInitialized) {
+                    setupAudio(); 
+                } else {
+                    startGame();
+                }
+            });
+            
+            navButtons.aprender.addEventListener('click', () => {
+                switchView('aprender');
+            });
+            
+            // Listeners del Juego (Se definen una sola vez)
+            document.getElementById('restartGame').addEventListener('click', restartGame);
+            
+            playButton.addEventListener('click', () => {
+                if (!isPlaying && !playButton.disabled && isAudioInitialized) {
+                    playChallenge();
+                } else if (isPlaying) {
+                    showMessage('El metrónomo está sonando. Espera a que termine.', false);
+                }
+            });
+
+            answerOptions.addEventListener('click', (e) => {
+                const button = e.target.closest('.option-button');
+                if (button && !button.disabled) {
+                    checkAnswer(button.getAttribute('data-answer'));
+                }
+            });
+            
+            // Estado inicial botón
+            playButton.disabled = true;
+            playButton.textContent = 'Esperando interacción para cargar audio...';
+        });
+
+        function switchView(viewName) {
+            currentView = viewName;
+            
+            // Cambiar visibilidad de secciones
+            Object.values(views).forEach(v => v.classList.add('hidden'));
+            views[viewName].classList.remove('hidden');
+            
+            // Actualizar estilos de botones de navegación
+            Object.entries(navButtons).forEach(([key, button]) => {
+                if (key === viewName) {
+                    button.className = "px-6 py-2 rounded-full font-bold text-lg transition duration-200 shadow-md bg-primary-blue text-white hover:bg-primary-blue/80";
+                } else {
+                    button.className = "px-6 py-2 rounded-full font-bold text-lg transition duration-200 shadow-md bg-gray-200 text-gray-800 hover:bg-accent-yellow hover:text-white";
+                }
+            });
+
+            // Limpieza al salir de la vista de juego
+            if (Tone.Transport && Tone.Transport.state === 'started') {
+                 Tone.Transport.stop();
+                 isPlaying = false;
+                 if (loop) { loop.dispose(); loop = null; }
+            }
+        }
+
+        // -----------------------------------------------------
+        // 4. LÓGICA DE AUDIO (TONE.JS)
+        // -----------------------------------------------------
+        
+        async function setupAudio() {
+            if (isAudioInitialized) return;
+
+            playButton.disabled = true;
+            playButton.textContent = 'Cargando Sonidos...'; 
+            
+            try {
+                await Tone.start();
+            } catch (error) {
+                console.error("Error audio:", error);
+                playButton.textContent = 'Error Audio';
+                return;
+            }
+            
+            strongSynth = new Tone.MembraneSynth({
+                pitchDecay: 0.05, octaves: 2, volume: -6,
+                envelope: { attack: 0.001, decay: 0.1, sustain: 0.0, release: 0.05, attackCurve: 'exponential' }
+            }).toDestination();
+            
+            weakSynth = new Tone.MembraneSynth({
+                pitchDecay: 0.03, octaves: 1, volume: -10,
+                envelope: { attack: 0.001, decay: 0.07, sustain: 0.0, release: 0.03, attackCurve: 'exponential' }
+            }).toDestination();
+            
+            isAudioInitialized = true;
+            playButton.disabled = false;
+            updateUI();
+            startGame(); 
+        }
+
+        function playChallenge() {
+            if (isPlaying || !isAudioInitialized || !currentChallenge.pattern) return;
+            
+            isPlaying = true;
+            playButton.disabled = true;
+            
+            const { pattern } = currentChallenge;
+            const measuresToPlay = 2; 
+            const stopTime = `${measuresToPlay}m`; 
+
+            // Limpieza previa
+            if (loop) loop.dispose();
+            Tone.Transport.stop(); 
+            Tone.Transport.cancel(); 
+            loop = null; 
+            
+            // Reset visual temporal
+            if (showVisuals) {
+                visualBeatElement.style.opacity = '1'; 
+                visualBeatElement.textContent = '?';
+                visualBeatElement.className = 'text-6xl font-black text-pending-gray'; 
+            } else {
+                visualBeatElement.style.opacity = '0';
+                visualBeatElement.textContent = '🎶'; 
+            }
+            
+            Tone.Transport.bpm.value = currentBPM; 
+            
+            const beatsPerMeasure = pattern.length;
+            let currentBeatIndex = 0; 
+            
+            // Definir el bucle
+            loop = new Tone.Loop(function (time) {
+                const beatIndexInMeasure = currentBeatIndex % beatsPerMeasure; 
+                const accent = pattern[beatIndexInMeasure];
+                
+                let currentSynth = weakSynth;
+                let note = "C4"; 
+                let velocity = 0.8; 
+
+                if (accent === 1) { 
+                    currentSynth = strongSynth; note = "G4"; velocity = 1.0; 
+                } else if (accent === 0.5) { 
+                    currentSynth = weakSynth; note = "C4"; velocity = 0.9;
+                }
+
+                currentSynth.triggerAttackRelease(note, "16n", time, velocity);
+
+                // Sincronización Visual
+                if (showVisuals) {
+                    Tone.Draw.schedule(function () {
+                        const visualIndex = beatIndexInMeasure + 1; 
+                        let colorClass = 'text-weak-beat';
+                        if (accent === 1) colorClass = 'text-strong-beat';
+                        else if (accent === 0.5) colorClass = 'text-medium-beat';
+                        
+                        visualBeatElement.classList.remove('beat-pulse');
+                        visualBeatElement.textContent = visualIndex;
+                        visualBeatElement.classList.remove('text-strong-beat', 'text-medium-beat', 'text-weak-beat', 'text-pending-gray');
+                        visualBeatElement.classList.add(colorClass);
+
+                        // Trigger reflow para reiniciar animación CSS
+                        void visualBeatElement.offsetWidth; 
+                        visualBeatElement.classList.add('beat-pulse');
+                        visualBeatElement.style.opacity = '1';
+                    }, time);
+                }
+                currentBeatIndex++; 
+            }, '4n').start(0); 
+            
+            // Programar parada
+            Tone.Transport.scheduleOnce(() => {
+                Tone.Transport.stop();
+                isPlaying = false; 
+                playButton.disabled = false;
+                
+                if (loop) { loop.dispose(); loop = null; }
+                
+                if (showVisuals) {
+                    visualBeatElement.textContent = '?';
+                    visualBeatElement.classList.remove('text-strong-beat', 'text-medium-beat', 'text-weak-beat', 'beat-pulse');
+                    visualBeatElement.classList.add('text-pending-gray');
+                    visualBeatElement.style.opacity = '1'; 
+                } else {
+                    visualBeatElement.textContent = '🎶'; 
+                    visualBeatElement.style.opacity = '0';
+                }
+            }, stopTime); 
+            
+            Tone.Transport.start();
+        }
+
+        // -----------------------------------------------------
+        // 5. LÓGICA DEL JUEGO
+        // -----------------------------------------------------
+
+        function startGame() {
+            score = 0;
+            level = 1;
+            lastChallenges.length = 0; 
+            updateUI();
+            gameOverModal.classList.add('hidden');
+            selectNewChallenge();
+        }
+
+        function restartGame() {
+            if (Tone.Transport && Tone.Transport.state === 'started') {
+                 Tone.Transport.stop();
+                 isPlaying = false;
+                 if (loop) { loop.dispose(); loop = null; }
+            }
+            startGame();
+        }
+
+        function selectNewChallenge() {
+            playButton.disabled = true;
+            playButton.textContent = 'Cargando...'; 
+
+            // Configurar Dificultad
+            if (level <= 4) {
+                currentBPM = 100; showVisuals = true;
+            } else if (level <= 7) {
+                currentBPM = 120; showVisuals = false;
+            } else {
+                currentBPM = 140; showVisuals = false;
+            }
+            
+            // Selección Aleatoria Evitando Repetición Inmediata
+            const allTypes = Object.keys(GAME_METERS);
+            const availableTypes = allTypes.filter(type => !lastChallenges.includes(type));
+            
+            let randomType = availableTypes.length > 0 
+                ? availableTypes[Math.floor(Math.random() * availableTypes.length)] 
+                : allTypes[Math.floor(Math.random() * allTypes.length)];
+            
+            lastChallenges.push(randomType);
+            if (lastChallenges.length > 2) lastChallenges.shift();
+            
+            const fractions = Object.keys(GAME_METERS[randomType]);
+            const randomFraction = fractions[Math.floor(Math.random() * fractions.length)];
+            
+            currentChallenge = {
+                type: randomType,
+                fraction: randomFraction,
+                pattern: GAME_METERS[randomType][randomFraction]
+            };
+            
+            // Reset UI de Opciones
+            Array.from(answerOptions.children).forEach(btn => {
+                btn.classList.remove('correct', 'wrong');
+                btn.disabled = false;
+            });
+            
+            // Reset Visual Metrónomo
+            if (showVisuals) {
+                visualBeatElement.style.opacity = '1';
+                visualBeatElement.textContent = '?';
+                visualBeatElement.classList.remove('text-strong-beat', 'text-medium-beat', 'text-weak-beat');
+                visualBeatElement.classList.add('text-pending-gray'); 
+            } else {
+                visualBeatElement.style.opacity = '0';
+                visualBeatElement.textContent = '🎶'; 
+            }
+
+            updateUI();
+            
+            if (isAudioInitialized) {
+                playButton.disabled = false;
+                playButton.textContent = `🔊 Escuchar Compás (BPM ${currentBPM})`;
+            }
+        }
+
+        function checkAnswer(selectedType) {
+            if (isPlaying) {
+                showMessage('Espera a que termine de sonar el compás.', true);
+                return;
+            }
+
+            playButton.disabled = true;
+            const correctType = currentChallenge.type;
+            const allButtons = Array.from(answerOptions.children);
+            
+            allButtons.forEach(btn => btn.disabled = true);
+            
+            allButtons.forEach(btn => {
+                const answer = btn.getAttribute('data-answer');
+                if (answer === correctType) btn.classList.add('correct');
+                else if (answer === selectedType) btn.classList.add('wrong');
+            });
+
+            if (selectedType === correctType) {
+                score += POINTS_PER_ROUND; 
+                showMessage(`¡CORRECTO! 🥳 Es un compás ${correctType} (${currentChallenge.fraction}).`, false);
+            } else {
+                showMessage(`INCORRECTO. 😞 Era un compás ${correctType} (${currentChallenge.fraction}).`, true);
+            }
+            
+            level++; 
+            updateUI();
+            
+            if (level > MAX_ROUNDS) {
+                document.getElementById('finalScore').textContent = `${score} / 100`;
+                setTimeout(endGame, 3500); 
+            } else {
+                setTimeout(() => { selectNewChallenge(); }, 3500);
+            }
+        }
+
+        function endGame() {
+            gameOverModal.classList.remove('hidden');
+        }
+
+        // -----------------------------------------------------
+        // 6. UTILIDADES UI
+        // -----------------------------------------------------
+
+        function updateUI() {
+            document.getElementById('gameScore').textContent = `${score} / 100`;
+            document.getElementById('gameLevel').textContent = `${level} / ${MAX_ROUNDS}`;
+            
+            if (currentView === 'jugar' && isAudioInitialized) {
+                document.getElementById('currentBPMDisplay').textContent = currentBPM;
+                playButton.textContent = `🔊 Escuchar Compás (BPM ${currentBPM})`;
+            }
+        }
+
+        function showMessage(text, isError = false) {
+            messageBox.textContent = text;
+            const colorClass = isError ? 'text-tap-red' : 'text-tap-green';
+            messageBox.className = `mt-6 text-center text-xl font-bold h-8 transition-colors duration-200 ${colorClass} beat-pulse`;
+            setTimeout(() => {
+                messageBox.textContent = '';
+                messageBox.classList.remove('beat-pulse');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
